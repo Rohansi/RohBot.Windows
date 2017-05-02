@@ -1,0 +1,139 @@
+﻿<Page
+    x:Class="RohBot.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:RohBot"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    NavigationCacheMode="Disabled"
+    Unloaded="SettingsPage_OnUnloaded"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!-- TODO: reduce duplication -->
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Small">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="Header.Visibility" Value="Visible" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Medium">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="641" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="Header.Visibility" Value="Collapsed" />
+                        <Setter Target="SettingsStack.(Grid.Row)" Value="0" />
+                        <Setter Target="SettingsStack.(Grid.RowSpan)" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Large">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1007" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="Header.Visibility" Value="Collapsed" />
+                        <Setter Target="SettingsStack.(Grid.Row)" Value="0" />
+                        <Setter Target="SettingsStack.(Grid.RowSpan)" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid
+            x:Name="Header"
+            Grid.Row="0"
+            Margin="{x:Bind Shell.SplitViewMargin, Mode=OneWay}"
+            Background="{ThemeResource RohBotNavBackgroundBrush}">
+
+            <TextBlock
+                Canvas.ZIndex="100"
+                FontSize="22"
+                VerticalAlignment="Center"
+                Margin="16,0,0,0"
+                Foreground="{ThemeResource RohBotNavForegroundBrush}"
+                Text="Settings" />
+        </Grid>
+
+        <StackPanel
+            x:Name="SettingsStack"
+            Grid.Row="1" Margin="16">
+            
+            <TextBlock Margin="0,0,0,8" Text="Notifications" FontSize="20" />
+
+            <ToggleSwitch
+                x:Name="NotificationToggleSwitch"
+                Margin="0,0,0,8"
+                OffContent="Off"
+                OnContent="On"
+                Toggled="NotificationToggleSwitch_OnToggled" />
+
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="400" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox
+                    x:Name="NotificationPatternText"
+                    Grid.Column="0"
+                    PlaceholderText="Regular Expression"
+                    MaxLength="100"
+                    IsSpellCheckEnabled="False"
+                    IsEnabled="{Binding Path=IsOn, ElementName=NotificationToggleSwitch}" />
+
+                <Button
+                    x:Name="NotificationPatternSaveButton"
+                    Grid.Column="1"
+                    Margin="8,0,0,0"
+                    Content="Save"
+                    IsEnabled="{Binding Path=IsOn, ElementName=NotificationToggleSwitch}"
+                    Click="NotificationPatternSaveButton_OnClick" />
+            </Grid>
+
+            <TextBlock Margin="0,8,0,8" Text="Time Format" FontSize="20" />
+
+            <ComboBox
+                x:Name="TimeFormatCombo"
+                Margin="0,0,0,8"
+                Width="200"
+                SelectionChanged="TimeFormatCombo_OnSelectionChanged" />
+
+            <TextBlock Margin="0,8,0,8" Text="Image Upload Size" FontSize="20" />
+
+            <ComboBox
+                x:Name="ImageSizeCombo"
+                Margin="0,0,0,8"
+                Width="200"
+                SelectionChanged="ImageSizeCombo_OnSelectionChanged" />
+
+            <TextBlock Margin="0,8,0,8" Text="Theme" FontSize="20" />
+
+            <ComboBox
+                x:Name="ThemeCombo"
+                Margin="0,0,0,8"
+                Width="200"
+                SelectionChanged="ThemeCombo_OnSelectionChanged" />
+
+            <TextBlock Margin="0,0,0,8" Text="App must be restarted to take effect." />
+
+            <TextBlock Margin="0,8,0,8" Text="Logout" FontSize="20" />
+
+            <Button
+                x:Name="LogoutButton"
+                Margin="0,0,0,8"
+                Content="Logout"
+                Click="LogoutButton_OnClick" />
+        </StackPanel>
+    </Grid>
+</Page>
+

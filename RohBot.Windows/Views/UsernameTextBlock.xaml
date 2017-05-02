@@ -1,0 +1,41 @@
+﻿<UserControl
+    x:Class="RohBot.Views.UsernameTextBlock"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Unloaded="UsernameTextBlock_OnUnloaded"
+    mc:Ignorable="d"
+    d:DesignHeight="32"
+    d:DesignWidth="400">
+
+    <Canvas x:Name="Outer" HorizontalAlignment="Left">
+        <RelativePanel x:Name="Container" LayoutUpdated="Container_LayoutUpdated">
+            <TextBlock
+                x:Name="Rank"
+                Text="&#x2605;"
+                Margin="0,0,3,0"
+                Visibility="Collapsed" />
+            
+            <TextBlock
+                x:Name="Before"
+                RelativePanel.RightOf="Rank"
+                RenderTransformOrigin="0.5,0.5"
+                Text="BEFORE"
+                Visibility="Collapsed" />
+            
+            <TextBlock
+                x:Name="Main"
+                RelativePanel.RightOf="Before"
+                RenderTransformOrigin="0.5,0.5"
+                Text="MAIN" />
+            
+            <TextBlock
+                x:Name="After"
+                RelativePanel.RightOf="Main"
+                RenderTransformOrigin="0.5,0.5"
+                Text="AFTER"
+                Visibility="Collapsed" />
+        </RelativePanel>
+    </Canvas>
+</UserControl>

@@ -1,0 +1,54 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="RohBotBackgroundBrush" Color="{ThemeResource RohBotBackgroundColor}" />
+
+    <SolidColorBrush x:Key="RohBotConnectingFadeBrush" Color="{ThemeResource RohBotConnectingFadeColor}" Opacity="0.5" />
+    <SolidColorBrush x:Key="RohBotConnectingBorderBrush" Color="{ThemeResource RohBotConnectingBorderColor}" />
+    <SolidColorBrush x:Key="RohBotConnectingBackgroundBrush" Color="{ThemeResource RohBotConnectingBackgroundColor}" />
+    <SolidColorBrush x:Key="RohBotConnectingForegroundBrush" Color="{ThemeResource RohBotConnectingForegroundColor}" />
+
+    <SolidColorBrush x:Key="RohBotNavBackgroundBrush" Color="{ThemeResource RohBotNavBackgroundColor}" />
+    <SolidColorBrush x:Key="RohBotNavBackgroundHoverBrush" Color="{ThemeResource RohBotNavBackgroundHoverColor}" />
+    <SolidColorBrush x:Key="RohBotNavBackgroundPressedBrush" Color="{ThemeResource RohBotNavBackgroundPressedColor}" />
+    <SolidColorBrush x:Key="RohBotNavForegroundBrush" Color="{ThemeResource RohBotNavForegroundColor}" />
+    <SolidColorBrush x:Key="RohBotNavIconBrush" Color="{ThemeResource RohBotNavIconColor}" />
+    <SolidColorBrush x:Key="RohBotNavHighlightBrush" Color="{ThemeResource RohBotNavHighlightColor}" />
+
+    <SolidColorBrush x:Key="RohBotGoldStarBrush" Color="{ThemeResource RohBotGoldStarColor}" />
+    <SolidColorBrush x:Key="RohBotSilverStarBrush" Color="{ThemeResource RohBotSilverStarColor}" />
+    <SolidColorBrush x:Key="RohBotWebBrush" Color="{ThemeResource RohBotWebColor}" />
+    <SolidColorBrush x:Key="RohBotSteamBrush" Color="{ThemeResource RohBotSteamColor}" />
+    <SolidColorBrush x:Key="RohBotSteamInGameBrush" Color="{ThemeResource RohBotSteamInGameColor}" />
+    <SolidColorBrush x:Key="RohBotNameGlowBrush" Color="{ThemeResource RohBotNameGlowColor}" />
+    <SolidColorBrush x:Key="RohBotNamePinkGlowBrush" Color="{ThemeResource RohBotNamePinkGlowColor}" />
+    <SolidColorBrush x:Key="RohBotNameOrangepeelBrush" Color="{ThemeResource RohBotNameOrangepeelColor}" />
+    <SolidColorBrush x:Key="RohBotNameUpsidedownBrush" Color="{ThemeResource RohBotNameUpsidedownColor}" />
+    <SolidColorBrush x:Key="RohBotNameRedBrush" Color="{ThemeResource RohBotNameRedColor}" />
+    <SolidColorBrush x:Key="RohBotNameAfricanBrush" Color="{ThemeResource RohBotNameAfricanColor}" />
+    <SolidColorBrush x:Key="RohBotNameHeartBrush" Color="{ThemeResource RohBotNameHeartColor}" />
+    <SolidColorBrush x:Key="RohBotNameGhostBrush" Color="{ThemeResource RohBotNameGhostColor}" />
+    <SolidColorBrush x:Key="RohBotNameHackerBrush" Color="{ThemeResource RohBotNameHackerColor}" />
+    <SolidColorBrush x:Key="RohBotNameBeanifyBrush" Color="{ThemeResource RohBotNameBeanifyColor}" />
+    <SolidColorBrush x:Key="RohBotNameHotBrush" Color="{ThemeResource RohBotNameHotColor}" />
+    <SolidColorBrush x:Key="RohBotNameThinBlueBrush" Color="{ThemeResource RohBotNameThinBlueColor}" />
+    <SolidColorBrush x:Key="RohBotNameCrackBrush" Color="{ThemeResource RohBotNameCrackColor}" />
+    <SolidColorBrush x:Key="RohBotNameMemeBlueBrush" Color="{ThemeResource RohBotNameMemeBlueColor}" />
+    <SolidColorBrush x:Key="RohBotNamePissYellowBrush" Color="{ThemeResource RohBotNamePissYellowColor}" />
+    <SolidColorBrush x:Key="RohBotNameLexiBrush" Color="{ThemeResource RohBotNameLexiColor}" />
+
+    <SolidColorBrush x:Key="RohBotMessageBackgroundBrush" Color="{ThemeResource RohBotMessageBackgroundColor}" />
+    <SolidColorBrush x:Key="RohBotMessageForegroundBrush" Color="{ThemeResource RohBotMessageForegroundColor}" />
+    <SolidColorBrush x:Key="RohBotMessageLinkForegroundBrush" Color="{ThemeResource RohBotMessageLinkForegroundColor}" />
+    <SolidColorBrush x:Key="RohBotDateForegroundBrush" Color="{ThemeResource RohBotDateForegroundColor}" />
+    
+    <SolidColorBrush x:Key="RohBotMessageBoxForegroundBrush" Color="{ThemeResource RohBotMessageBoxForegroundColor}" />
+    <SolidColorBrush x:Key="RohBotMessageBoxPlaceholderForegroundBrush" Color="{ThemeResource RohBotMessageBoxPlaceholderForegroundColor}" />
+
+    <SolidColorBrush x:Key="RohBotSendBackgroundBrush" Color="{ThemeResource RohBotSendBackgroundColor}" />
+    <SolidColorBrush x:Key="RohBotSendBackgroundHoverBrush" Color="{ThemeResource RohBotSendBackgroundHoverColor}" />
+    <SolidColorBrush x:Key="RohBotSendBackgroundDisabledBrush" Color="{ThemeResource RohBotSendBackgroundDisabledColor}" />
+    <SolidColorBrush x:Key="RohBotSendForegroundBrush" Color="{ThemeResource RohBotSendForegroundColor}" />
+    <SolidColorBrush x:Key="RohBotSendForegroundDisabledBrush" Color="{ThemeResource RohBotSendForegroundDisabledColor}" />
+</ResourceDictionary>

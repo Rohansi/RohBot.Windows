@@ -1,0 +1,31 @@
+﻿<UserControl
+    x:Class="RohBot.Views.ConnectingOverlay"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Loaded="ConnectingOverlay_OnLoaded"
+    Unloaded="ConnectingOverlay_OnUnloaded"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+        <Rectangle Fill="{ThemeResource RohBotConnectingFadeBrush}" />
+        
+        <StackPanel
+            VerticalAlignment="Center"
+            Background="{ThemeResource RohBotConnectingBackgroundBrush}"
+            BorderBrush="{ThemeResource RohBotConnectingBorderBrush}"
+            BorderThickness="0,2"
+            Padding="0,30">
+            
+            <TextBlock
+                Text="Connecting to server..."
+                HorizontalAlignment="Center"
+                Foreground="{ThemeResource RohBotConnectingForegroundBrush}" />
+            
+            <Button x:Name="FocusStealer" Height="0" Opacity="0" />
+        </StackPanel>
+    </Grid>
+</UserControl>
