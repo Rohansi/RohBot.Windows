@@ -269,11 +269,14 @@ namespace RohBot.Views
 
         private void MessageTextBox_KeyDown(object sender, KeyRoutedEventArgs args)
         {
+            var ctrlState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
+            var isCtrlDown = (ctrlState & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
+
+            var shiftState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
+            var isShiftDown = (shiftState & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
+
             if (args.Key == VirtualKey.Enter)
             {
-                var ctrlState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
-                var isCtrlDown = (ctrlState & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
-
                 if (!isCtrlDown)
                 {
                     SendButton_Tapped(null, null);
@@ -296,13 +299,11 @@ namespace RohBot.Views
                 args.Handled = true;
             }
 
-            if (args.Key == VirtualKey.Tab)
+            if (args.Key == VirtualKey.Tab && !isCtrlDown && !isShiftDown)
             {
                 Debug.WriteLine("Tab");
-
-                DoNameCompletion();
-
-                args.Handled = true;
+                
+                args.Handled = DoNameCompletion();
             }
             else
             {
@@ -310,7 +311,7 @@ namespace RohBot.Views
             }
         }
 
-        private void DoNameCompletion()
+        private bool DoNameCompletion()
         {
             var val = MessageTextBox.Text;
             var selectionStart = MessageTextBox.SelectionStart;
@@ -322,7 +323,7 @@ namespace RohBot.Views
 
                 var completionWord = val.Substring(wordStart, selectionStart - wordStart);
                 if (completionWord.Length == 0)
-                    return;
+                    return false;
 
                 _completionNames = _currentRoom.Users
                     .Select(u => u.Name)
@@ -332,7 +333,7 @@ namespace RohBot.Views
                 if (_completionNames.Count == 0)
                 {
                     _completionNames = null;
-                    return;
+                    return true;
                 }
 
                 _completionNames.Add(completionWord);
@@ -361,6 +362,29 @@ namespace RohBot.Views
             var end = val.Substring(_completionEnd);
             MessageTextBox.Text = begin + completionStr + end;
             MessageTextBox.SelectionStart = _completionEnd = _completionStart + completionStr.Length;
+
+            return true;
+        }
+        
+        protected override void OnKeyDown(KeyRoutedEventArgs e)
+        {
+            if (FocusManager.GetFocusedElement() == MessageTextBox)
+                return;
+
+            if (e.Key == VirtualKey.Control ||
+                e.Key == VirtualKey.Shift ||
+                e.Key == VirtualKey.Tab ||
+                e.Key == VirtualKey.Left ||
+                e.Key == VirtualKey.Right ||
+                e.Key == VirtualKey.Up ||
+                e.Key == VirtualKey.Down)
+            {
+                return;
+            }
+
+            MessageTextBox.Focus(FocusState.Programmatic);
+
+            base.OnKeyDown(e);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
