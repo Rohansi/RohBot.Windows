@@ -209,8 +209,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="Header.Visibility" Value="Collapsed" />
-                        <Setter Target="MessagesListView.(Grid.Row)" Value="0" />
-                        <Setter Target="MessagesListView.(Grid.RowSpan)" Value="2" />
+                        <Setter Target="MessagesGrid.(Grid.Row)" Value="0" />
+                        <Setter Target="MessagesGrid.(Grid.RowSpan)" Value="2" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="Large">
@@ -219,8 +219,8 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="Header.Visibility" Value="Collapsed" />
-                        <Setter Target="MessagesListView.(Grid.Row)" Value="0" />
-                        <Setter Target="MessagesListView.(Grid.RowSpan)" Value="2" />
+                        <Setter Target="MessagesGrid.(Grid.Row)" Value="0" />
+                        <Setter Target="MessagesGrid.(Grid.RowSpan)" Value="2" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -251,28 +251,44 @@
                 Text="{x:Bind CurrentRoom.Name, Mode=OneTime}" />
         </Grid>
 
-        <ListView
-            x:Name="MessagesListView"
-            Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
-            SelectionMode="None"
-            Background="{ThemeResource RohBotMessageBackgroundBrush}"
-            ItemsSource="{x:Bind CurrentRoom.Messages, Mode=OneTime}"
-            ItemTemplateSelector="{StaticResource MessageDataTemplateSelector}"
-            ItemContainerStyle="{StaticResource HistoryLineStyle}">
+        <Grid x:Name="MessagesGrid" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1">
+            <ListView
+                x:Name="MessagesListView"
+                SelectionMode="None"
+                Background="{ThemeResource RohBotMessageBackgroundBrush}"
+                ItemsSource="{x:Bind CurrentRoom.Messages, Mode=OneTime}"
+                ItemTemplateSelector="{StaticResource MessageDataTemplateSelector}"
+                ItemContainerStyle="{StaticResource HistoryLineStyle}">
 
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
 
-            <ListView.ItemContainerTransitions>
-                <TransitionCollection>
-                    <EntranceThemeTransition IsStaggeringEnabled="False" />
-                </TransitionCollection>
-            </ListView.ItemContainerTransitions>
-        </ListView>
-        
+                <ListView.ItemContainerTransitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition IsStaggeringEnabled="False" />
+                    </TransitionCollection>
+                </ListView.ItemContainerTransitions>
+            </ListView>
+
+            <Grid
+                Visibility="{x:Bind Shell.Client.IsLoggedIn, Mode=OneWay, Converter={StaticResource InvBoolToVis}}"
+                Width="250"
+                Padding="8"
+                VerticalAlignment="Top"
+                Background="{ThemeResource RohBotConnectingBackgroundBrush}"
+                BorderBrush="{ThemeResource RohBotConnectingBorderBrush}"
+                BorderThickness="2,0,2,2">
+                
+                <TextBlock
+                    Foreground="{ThemeResource RohBotConnectingForegroundBrush}"
+                    HorizontalAlignment="Center"
+                    Text="Connecting to server..." />
+            </Grid>
+        </Grid>
+
         <Button
             Grid.Column="0" Grid.Row="2"
             Style="{StaticResource CameraButtonStyle}"

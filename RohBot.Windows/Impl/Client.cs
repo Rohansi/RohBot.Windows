@@ -26,6 +26,7 @@ namespace RohBot.Impl
         public delegate void ClientSysMessageReceived(string message);
 
         private readonly Dictionary<string, Type> _packetTypes;
+        private readonly List<string> _receivedRooms;
         private Room _currentRoom;
         private bool _isLoggedIn;
         private string _name;
@@ -85,6 +86,8 @@ namespace RohBot.Impl
                 { "userList", typeof(UserList) },
             };
 
+            _receivedRooms = new List<string>();
+
             Connection = new Connection();
             Connection.Connected += OnConnected;
             Connection.Disconnected += OnDisconnected;
@@ -143,7 +146,7 @@ namespace RohBot.Impl
                     Settings.Token.Value = authResponse.Tokens;
 
                     Name = authResponse.Name;
-                    Rooms.Clear();
+                    _receivedRooms.Clear();
                     return;
                 }
 
@@ -152,8 +155,17 @@ namespace RohBot.Impl
                     switch (chat.Method)
                     {
                         case ChatMethod.Join:
-                            Rooms.Add(new Room(chat.ShortName, chat.Name));
+                        {
+                            var existingRoom = false;
+                            if (!IsLoggedIn)
+                            {
+                                _receivedRooms.Add(chat.ShortName);
+                                existingRoom = Rooms.Any(r => r.ShortName == chat.ShortName);
+                            }
 
+                            if (!existingRoom)
+                                Rooms.Add(new Room(chat.ShortName, chat.Name));
+                            
                             if (IsLoggedIn)
                                 AppShell.Current?.Join(chat.ShortName); // /join'd
 
@@ -171,12 +183,15 @@ namespace RohBot.Impl
                             });
 
                             return;
+                        }
 
                         case ChatMethod.Leave:
+                        {
                             var room = Rooms.FirstOrDefault(r => r.ShortName == chat.ShortName);
                             if (room != null)
                                 Rooms.Remove(room);
                             return;
+                        }
 
                         default:
                             throw new NotSupportedException();
@@ -249,6 +264,15 @@ namespace RohBot.Impl
                     var content = sysMessage.Content;
                     if (!IsLoggedIn)
                     {
+                        var oldRooms = Rooms
+                            .Where(r => !_receivedRooms.Contains(r.ShortName))
+                            .ToList();
+
+                        foreach (var room in oldRooms)
+                        {
+                            Rooms.Remove(room);
+                        }
+
                         if (content.StartsWith("Logged in as") ||
                             content == "You are already logged in." ||
                             content == "You can not register while logged in.")

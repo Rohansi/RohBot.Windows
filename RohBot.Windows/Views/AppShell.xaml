@@ -117,10 +117,6 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <views:ConnectingOverlay
-            Canvas.ZIndex="1000"
-            Visibility="{x:Bind Client.IsLoggedIn, Mode=OneWay, Converter={StaticResource InvBoolToVis}}" />
-
         <ToggleButton
             x:Name="TogglePaneButton"
             Canvas.ZIndex="100"
