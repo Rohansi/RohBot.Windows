@@ -84,6 +84,11 @@ namespace RohBot.Views
         private ScrollViewer _messagesScrollViewer;
         private ItemsStackPanel _messagesItemsPanel;
 
+        private List<string> _completionNames;
+        private int _completionIndex;
+        private int _completionStart;
+        private int _completionEnd;
+
         public ChatPage()
         {
             Shell = AppShell.Current;
@@ -266,20 +271,96 @@ namespace RohBot.Views
         {
             if (args.Key == VirtualKey.Enter)
             {
-                var shiftState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
-                var isShiftDown = (shiftState & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
+                var ctrlState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
+                var isCtrlDown = (ctrlState & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
 
-                if (!isShiftDown)
+                if (!isCtrlDown)
                 {
                     SendButton_Tapped(null, null);
                 }
                 else
                 {
-                    Debug.WriteLine("Shift+Enter");
+                    Debug.WriteLine("Ctrl+Enter");
+
+                    var start = MessageTextBox.SelectionStart;
+                    var end = start + MessageTextBox.SelectionLength;
+
+                    var text = MessageTextBox.Text;
+                    var before = text.Substring(0, start);
+                    var after = text.Substring(end);
+
+                    MessageTextBox.Text = before + "\r" + after;
+                    MessageTextBox.SelectionStart = start + 1;
                 }
 
                 args.Handled = true;
             }
+
+            if (args.Key == VirtualKey.Tab)
+            {
+                Debug.WriteLine("Tab");
+
+                DoNameCompletion();
+
+                args.Handled = true;
+            }
+            else
+            {
+                _completionNames = null;
+            }
+        }
+
+        private void DoNameCompletion()
+        {
+            var val = MessageTextBox.Text;
+            var selectionStart = MessageTextBox.SelectionStart;
+            var selectionEnd = selectionStart + MessageTextBox.SelectionLength;
+
+            if (_completionNames == null)
+            {
+                var wordStart = val.Substring(0, selectionStart).LastIndexOf(' ') + 1;
+
+                var completionWord = val.Substring(wordStart, selectionStart - wordStart);
+                if (completionWord.Length == 0)
+                    return;
+
+                _completionNames = _currentRoom.Users
+                    .Select(u => u.Name)
+                    .Where(n => n.StartsWith(completionWord, StringComparison.CurrentCultureIgnoreCase))
+                    .ToList();
+
+                if (_completionNames.Count == 0)
+                {
+                    _completionNames = null;
+                    return;
+                }
+
+                _completionNames.Add(completionWord);
+
+                _completionIndex = 0;
+                _completionStart = wordStart;
+                _completionEnd = selectionEnd;
+            }
+            else
+            {
+                _completionIndex++;
+                _completionIndex %= _completionNames.Count;
+            }
+
+            var completionStr = _completionNames[_completionIndex];
+
+            if (_completionIndex != _completionNames.Count - 1)
+            {
+                if (_completionStart == 0)
+                    completionStr += ":";
+
+                completionStr += " ";
+            }
+
+            var begin = val.Substring(0, _completionStart);
+            var end = val.Substring(_completionEnd);
+            MessageTextBox.Text = begin + completionStr + end;
+            MessageTextBox.SelectionStart = _completionEnd = _completionStart + completionStr.Length;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
