@@ -148,12 +148,19 @@ namespace OneSignalSDK_WP_WNS
 
         private static async void GetPushUri()
         {
-            var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
+            try
+            {
+                var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
 
-            channel.PushNotificationReceived -= channel_PushNotificationReceived;
-            channel.PushNotificationReceived += channel_PushNotificationReceived;
+                channel.PushNotificationReceived -= channel_PushNotificationReceived;
+                channel.PushNotificationReceived += channel_PushNotificationReceived;
 
-            SendSession(channel.Uri);
+                SendSession(channel.Uri);
+            }
+            catch
+            {
+                Debug.WriteLine("OneSignal: failed to create push notification channel");
+            }
         }
 
         static void channel_PushNotificationReceived(PushNotificationChannel sender, PushNotificationReceivedEventArgs args)
