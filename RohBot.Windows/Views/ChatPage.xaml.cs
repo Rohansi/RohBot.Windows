@@ -35,7 +35,7 @@ namespace RohBot.Views
 
         public bool UploadingImage
         {
-            get { return _uploadingImage; }
+            get => _uploadingImage;
             private set
             {
                 if (value == _uploadingImage) return;
@@ -46,7 +46,7 @@ namespace RohBot.Views
 
         public bool UploadIndeterminate
         {
-            get { return _uploadIntederminate; }
+            get => _uploadIntederminate;
             private set
             {
                 if (value == _uploadIntederminate) return;
@@ -57,7 +57,7 @@ namespace RohBot.Views
 
         public double UploadValue
         {
-            get { return _uploadValue; }
+            get => _uploadValue;
             private set
             {
                 if (Math.Abs(value - _uploadValue) < 0.01) return;
@@ -66,20 +66,11 @@ namespace RohBot.Views
             }
         }
 
-        public AppShell Shell
-        {
-            get { return _shell; }
-            private set
-            {
-                if (Equals(value, _shell)) return;
-                _shell = value;
-                OnPropertyChanged();
-            }
-        }
+        public AppShell Shell { get; }
 
         public Room CurrentRoom
         {
-            get { return _currentRoom; }
+            get => _currentRoom;
             set
             {
                 if (Equals(value, _currentRoom)) return;
@@ -87,8 +78,7 @@ namespace RohBot.Views
                 OnPropertyChanged();
             }
         }
-
-        private AppShell _shell;
+        
         private Room _currentRoom;
         private string _shortName;
         private ScrollViewer _messagesScrollViewer;
@@ -96,7 +86,7 @@ namespace RohBot.Views
 
         public ChatPage()
         {
-            _shell = AppShell.Current;
+            Shell = AppShell.Current;
 
             InitializeComponent();
         }

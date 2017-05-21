@@ -85,7 +85,7 @@ namespace RohBot.Views
 
         public IUsername Username
         {
-            get { return _username; }
+            get => _username;
             set
             {
                 if (value == _username)

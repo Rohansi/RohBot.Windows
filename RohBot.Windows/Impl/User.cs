@@ -28,7 +28,7 @@ namespace RohBot.Impl
         [JsonConverter(typeof(HtmlEncodeConverter))]
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 if (value == _name) return;
@@ -44,7 +44,7 @@ namespace RohBot.Impl
         [JsonConverter(typeof(StringEnumConverter), false)]
         public UserRank Rank
         {
-            get { return _rank; }
+            get => _rank;
             set
             {
                 if (value == _rank) return;
@@ -56,7 +56,7 @@ namespace RohBot.Impl
         [JsonProperty(Required = Required.Always)]
         public string Avatar
         {
-            get { return _avatar; }
+            get => _avatar;
             set
             {
                 if (value == _avatar) return;
@@ -68,7 +68,7 @@ namespace RohBot.Impl
         [JsonProperty(Required = Required.Always)]
         public string Status
         {
-            get { return _status; }
+            get => _status;
             set
             {
                 if (value == _status) return;
@@ -82,7 +82,7 @@ namespace RohBot.Impl
         [CanBeNull]
         public string Playing
         {
-            get { return _playing; }
+            get => _playing;
             set
             {
                 if (value == _playing) return;
@@ -98,7 +98,7 @@ namespace RohBot.Impl
         [JsonProperty(Required = Required.Always)]
         public string Style
         {
-            get { return _style; }
+            get => _style;
             set
             {
                 if (value == _style) return;

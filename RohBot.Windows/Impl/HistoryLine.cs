@@ -45,7 +45,7 @@ namespace RohBot.Impl
         [JsonConverter(typeof(HtmlEncodeConverter))]
         public string Content
         {
-            get { return _content; }
+            get => _content;
             set
             {
                 if (value == _content) return;

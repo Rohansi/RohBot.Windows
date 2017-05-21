@@ -42,7 +42,7 @@ namespace RohBot.Impl
         /// </summary>
         public bool HasUnreadMessages
         {
-            get { return _hasUnreadMessages; }
+            get => _hasUnreadMessages;
             set
             {
                 if (value == _hasUnreadMessages) return;

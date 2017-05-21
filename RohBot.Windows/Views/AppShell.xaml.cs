@@ -26,7 +26,7 @@ namespace RohBot.Views
 
         public Thickness SplitViewMargin
         {
-            get { return _splitViewMargin; }
+            get => _splitViewMargin;
             set
             {
                 if (value == _splitViewMargin) return;

@@ -230,7 +230,7 @@ namespace RohBot
                     connection.Disconnect();
                 }
             }
-            
+
             while (!ct.IsCancellationRequested)
             {
                 if (NetworkInformation.GetInternetConnectionProfile() == null)
@@ -238,7 +238,7 @@ namespace RohBot
                     Debug.WriteLine("No internet connection!");
 
                     // close the connection now so we dont wait for timeout
-                    Client.Instance.Connection.Disconnect();
+                    connection.Disconnect();
                 }
                 else if (!connection.IsConnected)
                 {
@@ -253,7 +253,7 @@ namespace RohBot
                         Debug.WriteLine($"Failed to connect to server: {e}");
                     }
                 }
-                
+
                 await Task.Delay(TimeSpan.FromSeconds(1), ct);
             }
         }

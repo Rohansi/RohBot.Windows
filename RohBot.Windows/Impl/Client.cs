@@ -25,7 +25,6 @@ namespace RohBot.Impl
         public delegate void ClientMessageReceived(Room room, HistoryLine line);
         public delegate void ClientSysMessageReceived(string message);
 
-        private object _sync = new object();
         private readonly Dictionary<string, Type> _packetTypes;
         private Room _currentRoom;
         private bool _isLoggedIn;
@@ -35,7 +34,7 @@ namespace RohBot.Impl
 
         public bool IsLoggedIn
         {
-            get { return _isLoggedIn; }
+            get => _isLoggedIn;
             private set
             {
                 if (value == _isLoggedIn) return;
@@ -46,7 +45,7 @@ namespace RohBot.Impl
 
         public string Name
         {
-            get { return _name; }
+            get => _name;
             private set
             {
                 if (value == _name) return;
@@ -59,7 +58,7 @@ namespace RohBot.Impl
 
         public Room CurrentRoom
         {
-            get { return _currentRoom; }
+            get => _currentRoom;
             set
             {
                 if (value == _currentRoom) return;
@@ -144,13 +143,12 @@ namespace RohBot.Impl
                 {
                     Settings.Token.Value = authResponse.Tokens;
 
-                    _name = authResponse.Name;
+                    Name = authResponse.Name;
                     Rooms.Clear();
                     return;
                 }
 
-                var chat = packet as Chat;
-                if (chat != null)
+                if (packet is Chat chat)
                 {
                     switch (chat.Method)
                     {
@@ -186,8 +184,7 @@ namespace RohBot.Impl
                     }
                 }
 
-                var chatHistory = packet as ChatHistory;
-                if (chatHistory != null)
+                if (packet is ChatHistory chatHistory)
                 {
                     var room = Rooms.FirstOrDefault(r => r.ShortName == chatHistory.ShortName);
                     if (room == null) return;
@@ -201,16 +198,14 @@ namespace RohBot.Impl
                     return;
                 }
 
-                var userList = packet as UserList;
-                if (userList != null)
+                if (packet is UserList userList)
                 {
                     var room = Rooms.FirstOrDefault(r => r.ShortName == userList.Target);
                     room?.UpdateUsers(userList.Users);
                     return;
                 }
 
-                var message = packet as Message;
-                if (message != null)
+                if (packet is Message message)
                 {
                     var line = message.Line;
                     var room = Rooms.FirstOrDefault(r => r.ShortName == line.Chat);
@@ -250,8 +245,7 @@ namespace RohBot.Impl
                     return;
                 }
 
-                var sysMessage = packet as SysMessage;
-                if (sysMessage != null)
+                if (packet is SysMessage sysMessage)
                 {
                     var content = sysMessage.Content;
                     if (!IsLoggedIn)
@@ -292,7 +286,7 @@ namespace RohBot.Impl
             });
         }
 
-        private void AddLineToRoom(Room room, HistoryLine line)
+        private static void AddLineToRoom(Room room, HistoryLine line)
         {
             // TODO: combine more efficiently. this reparses links!
             var prevLine = room.Messages.LastOrDefault();

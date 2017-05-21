@@ -153,7 +153,7 @@ namespace RohBot.Impl
 
         public bool IsConnected
         {
-            get { return _isConnected; }
+            get => _isConnected;
             private set
             {
                 if (value == _isConnected) return;
