@@ -186,6 +186,7 @@ namespace OneSignalSDK_WP_WNS
                 }
                 catch (Exception)
                 {
+                    Debug.WriteLine("OneSignal: failed to handle received notification");
                 }
             }
         }
@@ -208,11 +209,23 @@ namespace OneSignalSDK_WP_WNS
                 active_time = activeTime
             });
 
-            var client = GetHttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "players/" + mPlayerId + "/on_focus");
-            request.Content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var client = GetHttpClient();
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "players/" + mPlayerId + "/on_focus");
+                    request.Content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
 
-            client.SendAsync(request);
+                    await client.SendAsync(request);
+                }
+                catch
+                {
+                    Debug.WriteLine("OneSignal: failed to ping");
+                }
+            });
+
+            
         }
 
         private static void SendSession(string currentChannelUri)
@@ -254,28 +267,34 @@ namespace OneSignalSDK_WP_WNS
             else
                 jsonObject.Add(new JProperty("sdk_type", "native"));
 
-
-            var client = GetHttpClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, urlString);
-            request.Content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
-
-            client.SendAsync(request).ContinueWith(async (responseTask) => {
-                fallBackOneSignalSession.Dispose();
-                sessionCallInProgress = false;
-
-                if (responseTask.Result.IsSuccessStatusCode)
+            Task.Run(async () =>
+            {
+                try
                 {
-                    sessionCallDone = true;
-                    string content = await responseTask.Result.Content.ReadAsStringAsync();
-                    var jObject = JObject.Parse(content);
-                    string newId = (string)jObject["id"];
-                    if (newId != null)
+                    var client = GetHttpClient();
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, urlString);
+                    request.Content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+
+                    var result = await client.SendAsync(request);
+
+                    if (result.IsSuccessStatusCode)
                     {
-                        mPlayerId = newId;
-                        settings.Values["OneSignalPlayerId"] = newId;
-                        if (idsAvailableDelegate != null)
-                            idsAvailableDelegate(mPlayerId, mChannelUri);
+                        sessionCallDone = true;
+                        string content = await result.Content.ReadAsStringAsync();
+                        var jObject = JObject.Parse(content);
+                        string newId = (string)jObject["id"];
+                        if (newId != null)
+                        {
+                            mPlayerId = newId;
+                            settings.Values["OneSignalPlayerId"] = newId;
+                            if (idsAvailableDelegate != null)
+                                idsAvailableDelegate(mPlayerId, mChannelUri);
+                        }
                     }
+                }
+                catch
+                {
+                    Debug.WriteLine("OneSignal: failed to send session");
                 }
             });
         }
@@ -291,9 +310,20 @@ namespace OneSignalSDK_WP_WNS
                 opened = true
             });
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, "notifications/" + (string)jObject["custom"]["i"]);
-            request.Content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
-            GetHttpClient().SendAsync(request);
+            Task.Run(async () =>
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, "notifications/" + (string)jObject["custom"]["i"]);
+                    request.Content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
+                    await GetHttpClient().SendAsync(request);
+                }
+                catch
+                {
+                    Debug.WriteLine("OneSignal: failed to mark notification as opened");
+                }
+            });
+            
 
             if (openedFromNotification && jObject["custom"]["u"] != null)
             {

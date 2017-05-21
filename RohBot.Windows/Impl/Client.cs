@@ -160,7 +160,19 @@ namespace RohBot.Impl
                             if (IsLoggedIn)
                                 AppShell.Current?.Join(chat.ShortName); // /join'd
 
-                            SendAsync(new UserListRequest(chat.ShortName)); // TODO: defer this and periodically request
+                            // TODO: defer this and periodically request
+                            Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    await SendAsync(new UserListRequest(chat.ShortName));
+                                }
+                                catch
+                                {
+                                    Debug.WriteLine("Failed to request userlist");
+                                }
+                            });
+
                             return;
 
                         case ChatMethod.Leave:
