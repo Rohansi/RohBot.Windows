@@ -138,8 +138,7 @@ namespace RohBot.Impl
 
             var x = CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                var authResponse = packet as AuthenticateResponse;
-                if (authResponse != null)
+                if (packet is AuthenticateResponse authResponse)
                 {
                     Settings.Token.Value = authResponse.Tokens;
 

@@ -114,7 +114,7 @@ namespace RohBot.Views
 
         private void Client_OnMessageReceived(Room room, HistoryLine line)
         {
-            if (room == Client.CurrentRoom || line.Type != HistoryLineType.Chat)
+            if (room == Client.CurrentRoom || line.Type != HistoryLineType.Chat || line.SenderId == "0")
                 return;
 
             room.HasUnreadMessages = true;
