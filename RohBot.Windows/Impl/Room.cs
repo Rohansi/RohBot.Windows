@@ -30,7 +30,7 @@ namespace RohBot.Impl
         /// <summary>
         /// Messages shown in the chat.
         /// </summary>
-        public ObservableCollection<HistoryLine> Messages { get; }
+        public BulkObservableCollection<HistoryLine> Messages { get; }
 
         /// <summary>
         /// Users in the chat.
@@ -58,7 +58,7 @@ namespace RohBot.Impl
 
             Abbreviation = ShortName.Substring(0, Math.Min(ShortName.Length, 3));
 
-            Messages = new ObservableCollection<HistoryLine>();
+            Messages = new BulkObservableCollection<HistoryLine>();
             Users = new ObservableCollection<User>();
         }
 

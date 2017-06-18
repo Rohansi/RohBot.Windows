@@ -216,11 +216,15 @@ namespace RohBot.Impl
                     var room = Rooms.FirstOrDefault(r => r.ShortName == chatHistory.ShortName);
                     if (room == null) return;
 
-                    room.Messages.Clear();
+                    // make a copy so we can combine
+                    var newMessages = new List<HistoryLine>(chatHistory.Lines.Count);
                     foreach (var line in chatHistory.Lines)
                     {
-                        AddLineToRoom(room, line);
+                        AddLine(newMessages, line);
                     }
+
+                    // move them into the room's messages
+                    room.Messages.ReplaceWith(newMessages);
 
                     return;
                 }
@@ -323,9 +327,12 @@ namespace RohBot.Impl
             });
         }
 
-        private static void AddLineToRoom(Room room, HistoryLine line)
+        private static void AddLineToRoom(Room room, HistoryLine line) =>
+            AddLine(room.Messages, line);
+
+        private static void AddLine(ICollection<HistoryLine> messages, HistoryLine line)
         {
-            var prevLine = room.Messages.LastOrDefault();
+            var prevLine = messages.LastOrDefault();
             if (prevLine != null &&
                 line.Type == HistoryLineType.Chat &&
                 prevLine.Type == HistoryLineType.Chat &&
@@ -338,7 +345,7 @@ namespace RohBot.Impl
             else
             {
                 line.Simplify();
-                room.Messages.Add(line);
+                messages.Add(line);
             }
         }
 
