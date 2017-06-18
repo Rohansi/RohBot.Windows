@@ -1,7 +1,12 @@
-﻿namespace RohBot.Impl.Packets
+﻿using Windows.Data.Json;
+
+namespace RohBot.Impl.Packets
 {
-    internal class Ping : IPacket
+    internal class Ping : IJsonDeserializable
     {
-        public string Type => "ping";
+        public Ping(JsonObject obj)
+        {
+            
+        }
     }
 }

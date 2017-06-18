@@ -1,23 +1,27 @@
-﻿using Newtonsoft.Json;
+﻿using Windows.Data.Json;
 using RohBot.Annotations;
 
 namespace RohBot.Impl.Packets
 {
-    internal class NotificationSubscriptionRequest : IPacket
+    internal class NotificationSubscriptionRequest : IJsonSerializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "notificationSubscriptionRequest";
-
-        [JsonProperty(Required = Required.Always)]
         public string RegexPattern { get; }
-
-        [JsonProperty(Required = Required.Always)]
         public string DeviceToken { get; }
 
         public NotificationSubscriptionRequest([NotNull] string deviceToken, [NotNull] string regexPattern)
         {
             RegexPattern = regexPattern;
             DeviceToken = deviceToken;
+        }
+
+        public JsonObject Serialize()
+        {
+            return new JsonObject
+            {
+                { "Type", JsonValue.CreateStringValue("notificationSubscriptionRequest") },
+                { "RegexPattern", JsonValue.CreateStringValue(RegexPattern) },
+                { "DeviceToken", JsonValue.CreateStringValue(DeviceToken) }
+            };
         }
     }
 }

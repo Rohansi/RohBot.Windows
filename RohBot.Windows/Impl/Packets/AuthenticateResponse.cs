@@ -1,21 +1,18 @@
-﻿using Newtonsoft.Json;
-using RohBot.Annotations;
+﻿using Windows.Data.Json;
 
 namespace RohBot.Impl.Packets
 {
-    internal class AuthenticateResponse : IPacket
+    internal class AuthenticateResponse : IJsonDeserializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "authResponse";
+        public string Name { get; }
+        public string Tokens { get; }
+        public bool Success { get; }
 
-        [JsonProperty(Required = Required.AllowNull)]
-        [CanBeNull]
-        public string Name { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public string Tokens { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public bool Success { get; set; }
+        public AuthenticateResponse(JsonObject obj)
+        {
+            Name = obj.GetNamedStringOrNull("Name");
+            Tokens = obj.GetNamedString("Tokens");
+            Success = obj.GetNamedBoolean("Success");
+        }
     }
 }

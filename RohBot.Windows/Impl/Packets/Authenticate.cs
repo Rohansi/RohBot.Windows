@@ -1,6 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using Windows.Data.Json;
 using RohBot.Annotations;
 
 namespace RohBot.Impl.Packets
@@ -12,22 +11,11 @@ namespace RohBot.Impl.Packets
         Guest
     }
 
-    internal class Authenticate : IPacket
+    internal class Authenticate : IJsonSerializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "auth";
-
-        [JsonProperty(Required = Required.Always)]
-        [JsonConverter(typeof(StringEnumConverter), true)]
         public AuthenticateMethod Method { get; }
-
-        [JsonProperty(Required = Required.Always)]
         public string Username { get; }
-
-        [JsonProperty(Required = Required.Always)]
         public string Password { get; }
-
-        [JsonProperty(Required = Required.Always)]
         public string Tokens { get; }
         
         public Authenticate()
@@ -47,6 +35,42 @@ namespace RohBot.Impl.Packets
             Username = username;
             Password = password;
             Tokens = tokens ?? "";
+        }
+
+        public JsonObject Serialize()
+        {
+            var obj = new JsonObject
+            {
+                { "Type", JsonValue.CreateStringValue("auth") },
+                { "Method", JsonValue.CreateStringValue(MethodString) }
+            };
+
+            if (Method != AuthenticateMethod.Guest)
+            {
+                obj.Add("Username", JsonValue.CreateStringValue(Username));
+                obj.Add("Password", JsonValue.CreateStringValue(Password));
+            }
+
+            if (Method == AuthenticateMethod.Login && !string.IsNullOrEmpty(Tokens))
+            {
+                obj.Add("Tokens", JsonValue.CreateStringValue(Tokens));
+            }
+
+            return obj;
+        }
+
+        private string MethodString
+        {
+            get
+            {
+                switch (Method)
+                {
+                    case AuthenticateMethod.Guest: return "guest";
+                    case AuthenticateMethod.Login: return "login";
+                    case AuthenticateMethod.Register: return "register";
+                    default: throw new NotSupportedException(nameof(MethodString));
+                }
+            }
         }
     }
 }

@@ -62,7 +62,7 @@ namespace RohBot.Impl
             Users = new ObservableCollection<User>();
         }
 
-        public void UpdateUsers(List<User> newUserList)
+        public void UpdateUsers(IReadOnlyList<User> newUserList)
         {
             var removedUsers = Users.Except(newUserList).ToList();
             var addedUsers = newUserList.Except(Users).ToList();

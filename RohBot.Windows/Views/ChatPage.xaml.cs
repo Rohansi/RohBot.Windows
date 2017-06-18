@@ -12,6 +12,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.Data.Json;
 using Windows.Foundation.Metadata;
 using Windows.Storage.Pickers;
 using Windows.UI.Core;
@@ -19,7 +20,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
-using Newtonsoft.Json.Linq;
 using RohBot.Annotations;
 
 namespace RohBot.Views
@@ -223,8 +223,8 @@ namespace RohBot.Views
                     };
 
                     var result = await postTask;
-                    var resultObj = JObject.Parse(await result.Content.ReadAsStringAsync());
-                    var imageLink = resultObj["image"].ToObject<string>();
+                    var resultObj = JsonObject.Parse(await result.Content.ReadAsStringAsync());
+                    var imageLink = resultObj.GetNamedString("image");
 
                     for (var i = 0; i < 5; i++)
                     {

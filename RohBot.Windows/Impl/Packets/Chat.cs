@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System;
+using Windows.Data.Json;
 
 namespace RohBot.Impl.Packets
 {
@@ -9,19 +9,27 @@ namespace RohBot.Impl.Packets
         Leave
     }
 
-    internal class Chat : IPacket
+    internal class Chat : IJsonDeserializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "chat";
-
-        [JsonProperty(Required = Required.Always)]
-        [JsonConverter(typeof(StringEnumConverter), true)]
         public ChatMethod Method { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
         public string Name { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
         public string ShortName { get; set; }
+
+        public Chat(JsonObject obj)
+        {
+            Method = ParseMethod(obj.GetNamedString("Method"));
+            Name = obj.GetNamedString("Name");
+            ShortName = obj.GetNamedString("ShortName");
+        }
+
+        private ChatMethod ParseMethod(string value)
+        {
+            switch (value)
+            {
+                case "join": return ChatMethod.Join;
+                case "leave": return ChatMethod.Leave;
+                default: throw new NotSupportedException(nameof(Chat) + nameof(ParseMethod));
+            }
+        }
     }
 }

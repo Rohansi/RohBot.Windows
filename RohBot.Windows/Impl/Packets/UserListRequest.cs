@@ -1,19 +1,24 @@
-﻿using Newtonsoft.Json;
+﻿using Windows.Data.Json;
 using RohBot.Annotations;
 
 namespace RohBot.Impl.Packets
 {
-    internal class UserListRequest : IPacket
+    internal class UserListRequest : IJsonSerializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "userListRequest";
-
-        [JsonProperty(Required = Required.Always)]
         public string Target { get; }
 
         public UserListRequest([NotNull] string target)
         {
             Target = target;
+        }
+
+        public JsonObject Serialize()
+        {
+            return new JsonObject
+            {
+                { "Type", JsonValue.CreateStringValue("userListRequest") },
+                { "Target", JsonValue.CreateStringValue(Target) }
+            };
         }
     }
 }

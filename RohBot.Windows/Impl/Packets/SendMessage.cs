@@ -1,23 +1,27 @@
-﻿using Newtonsoft.Json;
+﻿using Windows.Data.Json;
 using RohBot.Annotations;
 
 namespace RohBot.Impl.Packets
 {
-    internal class SendMessage : IPacket
+    internal class SendMessage : IJsonSerializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "sendMessage";
-
-        [JsonProperty(Required = Required.Always)]
         public string Target { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
         public string Content { get; set; }
 
         public SendMessage([NotNull] string target, [NotNull] string content)
         {
             Target = target;
             Content = content;
+        }
+
+        public JsonObject Serialize()
+        {
+            return new JsonObject
+            {
+                { "Type", JsonValue.CreateStringValue("sendMessage") },
+                { "Target", JsonValue.CreateStringValue(Target) },
+                { "Content", JsonValue.CreateStringValue(Content) }
+            };
         }
     }
 }

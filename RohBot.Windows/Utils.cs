@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Windows.Data.Json;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
@@ -172,6 +173,18 @@ namespace RohBot
                 resizedStream.Seek(0);
                 return resizedStream;
             }
+        }
+
+        public static string GetNamedStringOrNull(this JsonObject obj, string key)
+        {
+            if (!obj.ContainsKey(key))
+                return null;
+
+            var value = obj.GetNamedValue(key);
+            if (value.ValueType != JsonValueType.String)
+                return null;
+
+            return value.GetString();
         }
     }
 }

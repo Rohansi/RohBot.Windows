@@ -1,17 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using Windows.Data.Json;
 
 namespace RohBot.Impl.Packets
 {
-    internal class SysMessage : IPacket
+    internal class SysMessage : IJsonDeserializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "sysMessage";
-
-        [JsonProperty(Required = Required.Always)]
         public long Date { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        [JsonConverter(typeof(HtmlEncodeConverter))]
         public string Content { get; set; }
+
+        public SysMessage(JsonObject obj)
+        {
+            Date = (long)obj.GetNamedNumber("Date");
+            Content = HtmlEncoder.Decode(obj.GetNamedString("Content"));
+        }
     }
 }

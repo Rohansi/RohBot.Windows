@@ -1,10 +1,10 @@
-﻿using System.Collections.ObjectModel;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System;
+using System.Collections.ObjectModel;
 using RohBot.Annotations;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Windows.ApplicationModel.Core;
+using Windows.Data.Json;
 using Windows.UI.Core;
 
 namespace RohBot.Impl
@@ -27,22 +27,14 @@ namespace RohBot.Impl
         Client // gay shit
     }
 
-    public sealed class HistoryLine : INotifyPropertyChanged
+    public sealed class HistoryLine : INotifyPropertyChanged // TODO: remove prop change
     {
         private string _content;
-
-        [JsonProperty(Required = Required.Always)]
-        [JsonConverter(typeof(StringEnumConverter), true)] // camelCase
+        
         public HistoryLineType Type { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
         public long Date { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
         public string Chat { get; set; }
 
-        [JsonProperty(Required = Required.Always)]
-        [JsonConverter(typeof(HtmlEncodeConverter))]
         public string Content
         {
             get => _content;
@@ -55,66 +47,63 @@ namespace RohBot.Impl
         }
 
         #region Type == Chat
-
-        [JsonProperty(Required = Required.DisallowNull)]
-        public string UserType { get; set; }
-
-        [JsonProperty(Required = Required.DisallowNull)]
-        [JsonConverter(typeof(HtmlEncodeConverter))]
-        public string Sender { get; set; }
-
-        [JsonProperty(Required = Required.DisallowNull)]
-        public string SenderId { get; set; }
-
-        [JsonProperty(Required = Required.DisallowNull)]
-        public string SenderStyle { get; set; }
-
-        [JsonProperty(Required = Required.DisallowNull)]
-        public bool InGame { get; set; }
+        
+        public string UserType { get; }
+        public string Sender { get; }
+        public string SenderId { get; }
+        public string SenderStyle { get; }
+        public bool InGame { get; }
 
         #endregion
 
         #region Type == State
-
-        [JsonProperty(Required = Required.DisallowNull)]
-        [JsonConverter(typeof(StringEnumConverter), false)] // PascalCase
+        
         public HistoryLineState State { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [JsonConverter(typeof(HtmlEncodeConverter))]
-        [CanBeNull]
+        
         public string For { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [CanBeNull]
         public string ForId { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [CanBeNull]
         public string ForType { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [CanBeNull]
         public string ForStyle { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [JsonConverter(typeof(HtmlEncodeConverter))]
-        [CanBeNull]
+        
         public string By { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [CanBeNull]
         public string ById { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [CanBeNull]
         public string ByType { get; set; }
-
-        [JsonProperty(Required = Required.Default)]
-        [CanBeNull]
         public string ByStyle { get; set; }
 
         #endregion
+
+        public HistoryLine() { }
+
+        public HistoryLine(JsonObject obj)
+        {
+            Type = ParseType(obj.GetNamedString("Type"));
+            Date = (long)obj.GetNamedNumber("Date");
+            Chat = obj.GetNamedString("Chat");
+            Content = HtmlEncoder.Decode(obj.GetNamedString("Content"));
+
+            if (Type == HistoryLineType.Chat)
+            {
+                UserType = obj.GetNamedStringOrNull("UserType");
+                Sender = HtmlEncoder.Decode(obj.GetNamedStringOrNull("Sender"));
+                SenderId = obj.GetNamedStringOrNull("SenderId");
+                SenderStyle = obj.GetNamedStringOrNull("SenderStyle");
+                InGame = obj.GetNamedBoolean("InGame");
+            }
+
+            if (Type == HistoryLineType.State)
+            {
+                State = ParseState(obj.GetNamedString("State"));
+                For = HtmlEncoder.Decode(obj.GetNamedStringOrNull("For"));
+                ForId = obj.GetNamedStringOrNull("ForId");
+                ForType = obj.GetNamedStringOrNull("ForType");
+                ForStyle = obj.GetNamedStringOrNull("ForStyle");
+
+                By = HtmlEncoder.Decode(obj.GetNamedStringOrNull("By"));
+                ById = obj.GetNamedStringOrNull("ById");
+                ByType = obj.GetNamedStringOrNull("ByType");
+                ByStyle = obj.GetNamedStringOrNull("ByStyle");
+            }
+        }
 
         public ObservableCollection<string> Messages { get; private set; }
         
@@ -210,6 +199,32 @@ namespace RohBot.Impl
                 case HistoryLineState.Action:
                     Content = Content.Substring(For.Length + 1);
                     break;
+            }
+        }
+
+        private static HistoryLineType ParseType(string value)
+        {
+            switch (value)
+            {
+                case "chat": return HistoryLineType.Chat;
+                case "state": return HistoryLineType.State;
+                default: throw new NotSupportedException(nameof(HistoryLine) + nameof(ParseType));
+            }
+        }
+
+        private static HistoryLineState ParseState(string value)
+        {
+            switch (value)
+            {
+                case "Enter": return HistoryLineState.Enter;
+                case "Left": return HistoryLineState.Left;
+                case "Disconnected": return HistoryLineState.Disconnected;
+                case "Kicked": return HistoryLineState.Kicked;
+                case "Banned": return HistoryLineState.Banned;
+                case "Unbanned": return HistoryLineState.Unbanned;
+                case "Action": return HistoryLineState.Action;
+                case "Client": return HistoryLineState.Client;
+                default: throw new NotSupportedException(nameof(HistoryLine) + nameof(ParseState));
             }
         }
     }

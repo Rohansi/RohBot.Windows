@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Linq;
+using Windows.Data.Json;
 
 namespace RohBot.Impl.Packets
 {
-    internal class UserList : IPacket
+    internal class UserList : IJsonDeserializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "userList";
+        public string Target { get; }
+        public IReadOnlyList<User> Users { get; }
 
-        [JsonProperty("ShortName", Required = Required.Always)]
-        public string Target { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public List<User> Users { get; set; }
+        public UserList(JsonObject obj)
+        {
+            Target = obj.GetNamedString("ShortName");
+            Users = obj.GetNamedArray("Users").Select(o => new User(o.GetObject())).ToList();
+        }
     }
 }

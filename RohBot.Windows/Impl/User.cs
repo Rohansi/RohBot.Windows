@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using RohBot.Annotations;
+﻿using RohBot.Annotations;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Windows.Data.Json;
 
 namespace RohBot.Impl
 {
@@ -23,9 +22,7 @@ namespace RohBot.Impl
         private string _status;
         private string _playing;
         private string _style;
-
-        [JsonProperty(Required = Required.Always)]
-        [JsonConverter(typeof(HtmlEncodeConverter))]
+        
         public string Name
         {
             get => _name;
@@ -37,11 +34,8 @@ namespace RohBot.Impl
             }
         }
 
-        [JsonProperty(Required = Required.Always)]
         public string UserId { get; set; }
 
-        [JsonProperty(Required = Required.Always)]
-        [JsonConverter(typeof(StringEnumConverter), false)]
         public UserRank Rank
         {
             get => _rank;
@@ -53,7 +47,6 @@ namespace RohBot.Impl
             }
         }
 
-        [JsonProperty(Required = Required.Always)]
         public string Avatar
         {
             get => _avatar;
@@ -65,7 +58,6 @@ namespace RohBot.Impl
             }
         }
 
-        [JsonProperty(Required = Required.Always)]
         public string Status
         {
             get => _status;
@@ -77,9 +69,6 @@ namespace RohBot.Impl
             }
         }
 
-        [JsonProperty(Required = Required.AllowNull)]
-        [JsonConverter(typeof(HtmlEncodeConverter))]
-        [CanBeNull]
         public string Playing
         {
             get => _playing;
@@ -92,10 +81,8 @@ namespace RohBot.Impl
             }
         }
 
-        [JsonProperty(Required = Required.Always)]
         public bool Web { get; set; }
 
-        [JsonProperty(Required = Required.Always)]
         public string Style
         {
             get => _style;
@@ -107,6 +94,20 @@ namespace RohBot.Impl
             }
         }
         
+        public User() { }
+
+        public User(JsonObject obj)
+        {
+            Name = HtmlEncoder.Decode(obj.GetNamedString("Name"));
+            UserId = obj.GetNamedString("UserId");
+            Rank = ParseRank(obj.GetNamedString("Rank"));
+            Avatar = obj.GetNamedStringOrNull("Avatar");
+            Status = obj.GetNamedStringOrNull("Status");
+            Playing = HtmlEncoder.Decode(obj.GetNamedStringOrNull("Playing"));
+            Web = obj.GetNamedBoolean("Web");
+            Style = obj.GetNamedStringOrNull("Style");
+        }
+        
         bool IUsername.InGame => !string.IsNullOrWhiteSpace(Playing);
         bool IUsername.IsWeb => Web;
 
@@ -115,24 +116,26 @@ namespace RohBot.Impl
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
-        public override int GetHashCode()
-        {
-            return UserId.GetHashCode();
-        }
+        public override int GetHashCode() => UserId.GetHashCode();
 
-        public bool Equals(User other)
-        {
-            return UserId == other.UserId;
-        }
+        public bool Equals(User other) => UserId == other.UserId;
 
-        public int CompareTo(User other)
+        public int CompareTo(User other) =>
+            StringComparer.OrdinalIgnoreCase.Compare(Name, other.Name);
+
+        private static UserRank ParseRank(string value)
         {
-            return StringComparer.OrdinalIgnoreCase.Compare(Name, other.Name);
+            switch (value)
+            {
+                case "Guest": return UserRank.Guest;
+                case "Member": return UserRank.Member;
+                case "Moderator": return UserRank.Moderator;
+                case "Administrator": return UserRank.Administrator;
+                default: throw new NotSupportedException(nameof(User) + nameof(ParseRank));
+            }
         }
     }
 }

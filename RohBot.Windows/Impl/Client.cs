@@ -7,9 +7,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.Data.Json;
 using Windows.UI.Core;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RohBot.Annotations;
 using RohBot.Impl.Packets;
 using RohBot.Views;
@@ -18,6 +17,8 @@ namespace RohBot.Impl
 {
     public sealed class Client : INotifyPropertyChanged
     {
+        private delegate IJsonDeserializable PacketConstructor(JsonObject obj);
+
         private static readonly Lazy<Client> Lazy = new Lazy<Client>(() => new Client());
         public static Client Instance => Lazy.Value;
 
@@ -25,7 +26,7 @@ namespace RohBot.Impl
         public delegate void ClientMessageReceived(Room room, HistoryLine line);
         public delegate void ClientSysMessageReceived(string message);
 
-        private readonly Dictionary<string, Type> _packetTypes;
+        private readonly Dictionary<string, PacketConstructor> _packetTypes;
         private readonly List<string> _receivedRooms;
         private Room _currentRoom;
         private bool _isLoggedIn;
@@ -86,16 +87,16 @@ namespace RohBot.Impl
 
         private Client()
         {
-            _packetTypes = new Dictionary<string, Type>
+            _packetTypes = new Dictionary<string, PacketConstructor>
             {
-                { "authResponse", typeof(AuthenticateResponse) },
-                { "chat", typeof(Chat) },
-                { "chatHistory", typeof(ChatHistory) },
-                { "message", typeof(Message) },
-                { "notificationSubscription", typeof(NotificationSubscription) },
-                { "ping", typeof(Ping) },
-                { "sysMessage", typeof(SysMessage) },
-                { "userList", typeof(UserList) },
+                { "authResponse", o => new AuthenticateResponse(o) },
+                { "chat", o => new Chat(o) },
+                { "chatHistory", o => new ChatHistory(o) },
+                { "message", o => new Message(o) },
+                { "notificationSubscription", o => new NotificationSubscription(o) },
+                { "ping", o => new Ping(o) },
+                { "sysMessage", o => new SysMessage(o) },
+                { "userList", o => new UserList(o) },
             };
 
             _receivedRooms = new List<string>();
@@ -108,9 +109,9 @@ namespace RohBot.Impl
             Rooms = new ObservableCollection<Room>();
         }
 
-        public Task SendAsync(IPacket packet)
+        public Task SendAsync(IJsonSerializable packet)
         {
-            var message = JsonConvert.SerializeObject(packet); // TODO: can fail
+            var message = packet.Serialize().Stringify();
             return Connection.SendAsync(message);
         }
 
@@ -144,10 +145,10 @@ namespace RohBot.Impl
         {
             Debug.WriteLine($"Message received: {args.Message}");
 
-            var obj = JObject.Parse(args.Message); // TODO: can fail
-            var typeId = obj["Type"]?.ToObject<string>(); // TODO: can be null
-            var type = _packetTypes[typeId]; // TODO: can fail
-            var packet = (IPacket)obj.ToObject(type); // TODO: can fail
+            var obj = JsonObject.Parse(args.Message); // TODO: can fail
+            var typeId = obj.GetNamedString("Type"); // TODO: can fail
+            var typeBuilder = _packetTypes[typeId]; // TODO: can fail
+            var packet = typeBuilder(obj); // TODO: can fail
 
             // TODO: dispatch packet to handlers
 

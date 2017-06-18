@@ -1,13 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Windows.Data.Json;
 
 namespace RohBot.Impl.Packets
 {
-    internal class Message : IPacket
+    internal class Message : IJsonDeserializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "message";
+        public HistoryLine Line { get; }
 
-        [JsonProperty(Required = Required.Always)]
-        public HistoryLine Line { get; set; }
+        public Message(JsonObject obj)
+        {
+            Line = new HistoryLine(obj.GetNamedObject("Line"));
+        }
     }
 }

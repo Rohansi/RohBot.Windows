@@ -1,28 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace RohBot.Impl
 {
-    internal sealed class HtmlEncodeConverter : JsonConverter
+    internal static class HtmlEncoder
     {
-        public override bool CanRead => true;
-        public override bool CanWrite => true;
-        public override bool CanConvert(Type objectType) => objectType == typeof(string);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return HtmlDecode((string)reader.Value);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            writer.WriteValue(HtmlEncode((string)value));
-        }
-
-        private static string HtmlEncode(string value)
+        public static string Encode(string value)
         {
             var result = new StringBuilder(value.Length);
             foreach (var cp in AsCodePoints(value))
@@ -94,7 +78,7 @@ namespace RohBot.Impl
             return result.ToString();
         }
 
-        private static string HtmlDecode(string value) => WebUtility.HtmlDecode(value);
+        public static string Decode(string value) => WebUtility.HtmlDecode(value);
 
         private static IEnumerable<int> AsCodePoints(string s)
         {

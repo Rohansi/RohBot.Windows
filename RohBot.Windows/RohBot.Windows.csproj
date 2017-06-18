@@ -106,6 +106,8 @@
     <Compile Include="Converters\HomeLinkifyConverter.cs" />
     <Compile Include="Converters\InvertBooleanConverter.cs" />
     <Compile Include="Converters\UnreadToBrushConverter.cs" />
+    <Compile Include="Impl\IJsonSerializable.cs" />
+    <Compile Include="Impl\IJsonDeserializable.cs" />
     <Compile Include="OneSignal.cs" />
     <Compile Include="Converters\ReferenceToVisibilityConverter.cs" />
     <Compile Include="Setting.cs" />
@@ -133,7 +135,6 @@
     <Compile Include="Impl\Packets\Chat.cs" />
     <Compile Include="Impl\Packets\ChatHistory.cs" />
     <Compile Include="Impl\Packets\ChatHistoryRequest.cs" />
-    <Compile Include="Impl\Packets\IPacket.cs" />
     <Compile Include="Impl\Packets\Message.cs" />
     <Compile Include="Impl\Packets\NotificationSubscription.cs" />
     <Compile Include="Impl\Packets\NotificationSubscriptionRequest.cs" />

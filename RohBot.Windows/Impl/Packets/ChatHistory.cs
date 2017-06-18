@@ -1,23 +1,22 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Linq;
+using Windows.Data.Json;
 
 namespace RohBot.Impl.Packets
 {
-    internal class ChatHistory : IPacket
+    internal class ChatHistory : IJsonDeserializable
     {
-        [JsonProperty(Required = Required.Always)]
-        public string Type => "chatHistory";
+        public string ShortName { get; }
+        public bool Requested { get; }
+        public IReadOnlyList<HistoryLine> Lines { get; }
+        public long OldestLine { get; }
 
-        [JsonProperty(Required = Required.Always)]
-        public string ShortName { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public bool Requested { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public ICollection<HistoryLine> Lines { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public long OldestLine { get; set; }
+        public ChatHistory(JsonObject obj)
+        {
+            ShortName = obj.GetNamedString("ShortName");
+            Requested = obj.GetNamedBoolean("Requested");
+            Lines = obj.GetNamedArray("Lines").Select(o => new HistoryLine(o.GetObject())).ToList();
+            OldestLine = (long)obj.GetNamedNumber("OldestLine");
+        }
     }
 }

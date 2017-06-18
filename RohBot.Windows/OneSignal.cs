@@ -1,19 +1,21 @@
-﻿using Newtonsoft.Json.Linq;
-using RohBot.Annotations;
+﻿using RohBot.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.Data.Json;
 using Windows.Networking.PushNotifications;
 using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.Storage;
 using Windows.UI.Core;
+using RohBot;
 using RohBot.Impl;
 
 namespace OneSignalSDK_WP_WNS
@@ -140,9 +142,9 @@ namespace OneSignalSDK_WP_WNS
         {
             if (!args.Equals(""))
             {
-                var json = JObject.Parse(args);
-                if (json["custom"] != null)
-                    NotificationOpened("", args, true);
+                var json = JsonObject.Parse(args);
+                if (json.ContainsKey("custom"))
+                    NotificationOpened("", json, true);
             }
         }
 
@@ -173,22 +175,30 @@ namespace OneSignalSDK_WP_WNS
                 try
                 {
                     string lauchJson = (string)args.ToastNotification.Content.FirstChild.Attributes.GetNamedItem("launch").NodeValue;
-                    var json = JObject.Parse(lauchJson);
+                    var json = JsonObject.Parse(lauchJson);
 
-                    var custom = json["custom"];
-                    if (custom != null)
+                    if (json.ContainsKey("custom"))
                     {
                         var bindingNode = args.ToastNotification.Content.SelectSingleNode("/toast/visual/binding");
                         string text1 = bindingNode.SelectSingleNode("text[@id='2']").InnerText;
 
-                        var chat = custom["a"]?["chat"]?.ToObject<string>();
-                        if (chat == Client.Instance.CurrentRoom?.ShortName) // TODO: have a callback for this
+                        var custom = json.GetNamedObject("custom");
+                        if (custom.ContainsKey("a"))
                         {
-                            args.ToastNotification.SuppressPopup = true;
-                            args.Cancel = true;
+                            var a = custom.GetNamedObject("a");
+                            if (a.ContainsKey("chat"))
+                            {
+                                var chat = a.GetNamedString("chat");
+
+                                if (chat == Client.Instance.CurrentRoom?.ShortName) // TODO: have a callback for this
+                                {
+                                    args.ToastNotification.SuppressPopup = true;
+                                    args.Cancel = true;
+                                }
+                            }
                         }
 
-                        NotificationOpened(text1, lauchJson, false);
+                        NotificationOpened(text1, json, false);
                     }
                 }
                 catch (Exception)
@@ -210,11 +220,11 @@ namespace OneSignalSDK_WP_WNS
             if (mPlayerId == null)
                 return;
 
-            var jsonObject = JObject.FromObject(new
+            var jsonObject = new JsonObject
             {
-                state = "ping",
-                active_time = activeTime
-            });
+                { "state", JsonValue.CreateStringValue("ping") },
+                { "active_time", JsonValue.CreateNumberValue(activeTime) }
+            };
 
             Task.Run(async () =>
             {
@@ -255,24 +265,24 @@ namespace OneSignalSDK_WP_WNS
             PackageVersion pv = Package.Current.Id.Version;
             String appVersion = pv.Major + "." + pv.Minor + "." + pv.Revision + "." + pv.Build;
 
-            JObject jsonObject = JObject.FromObject(new
+            var jsonObject = new JsonObject
             {
-                device_type = 6,
-                app_id = mAppId,
-                identifier = mChannelUri,
-                ad_id = adId,
-                device_model = deviceInformation.SystemProductName,
-                game_version = appVersion,
-                language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToString(),
-                timezone = TimeZoneInfo.Local.BaseUtcOffset.TotalSeconds.ToString(),
-                sdk = VERSION
-            });
+                { "device_type", JsonValue.CreateNumberValue(6) },
+                { "app_id", JsonValue.CreateStringValue(mAppId) },
+                { "identifier", JsonValue.CreateStringValue(mChannelUri) },
+                { "ad_id", JsonValue.CreateStringValue(adId) },
+                { "device_model", JsonValue.CreateStringValue(deviceInformation.SystemProductName) },
+                { "game_version", JsonValue.CreateStringValue(appVersion) },
+                { "language", JsonValue.CreateStringValue(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName) },
+                { "timezone", JsonValue.CreateStringValue(TimeZoneInfo.Local.BaseUtcOffset.TotalSeconds.ToString()) },
+                { "sdk", JsonValue.CreateStringValue(VERSION) }
+            };
 
             string urlString = "players";
             if (mPlayerId != null)
                 urlString += "/" + mPlayerId + "/on_session";
             else
-                jsonObject.Add(new JProperty("sdk_type", "native"));
+                jsonObject.Add("sdk_type", JsonValue.CreateStringValue("native"));
 
             Task.Run(async () =>
             {
@@ -288,8 +298,8 @@ namespace OneSignalSDK_WP_WNS
                     {
                         sessionCallDone = true;
                         string content = await result.Content.ReadAsStringAsync();
-                        var jObject = JObject.Parse(content);
-                        string newId = (string)jObject["id"];
+                        var jObject = JsonObject.Parse(content);
+                        string newId = jObject.GetNamedStringOrNull("id");
                         if (newId != null)
                         {
                             mPlayerId = newId;
@@ -306,22 +316,22 @@ namespace OneSignalSDK_WP_WNS
             });
         }
 
-        private static void NotificationOpened(string message, string jsonParams, bool openedFromNotification)
+        private static void NotificationOpened(string message, JsonObject jObject, bool openedFromNotification)
         {
-            JObject jObject = JObject.Parse(jsonParams);
-
-            JObject jsonObject = JObject.FromObject(new
+            var jsonObject = new JsonObject
             {
-                app_id = mAppId,
-                player_id = mPlayerId,
-                opened = true
-            });
+                { "app_id", JsonValue.CreateStringValue(mAppId) },
+                { "player_id", JsonValue.CreateStringValue(mPlayerId) },
+                { "opened", JsonValue.CreateBooleanValue(true) }
+            };
+
+            var custom = jObject.GetNamedObject("custom");
 
             Task.Run(async () =>
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, "notifications/" + (string)jObject["custom"]["i"]);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, "notifications/" + custom.GetNamedString("i"));
                     request.Content = new StringContent(jsonObject.ToString(), Encoding.UTF8, "application/json");
                     await GetHttpClient().SendAsync(request);
                 }
@@ -332,19 +342,21 @@ namespace OneSignalSDK_WP_WNS
             });
             
 
-            if (openedFromNotification && jObject["custom"]["u"] != null)
+            if (openedFromNotification && custom.ContainsKey("u"))
             {
-                var uri = new Uri((string)jObject["custom"]["u"], UriKind.Absolute);
+                var uri = new Uri(custom.GetNamedString("u"), UriKind.Absolute);
                 Task.Run(() => Windows.System.Launcher.LaunchUriAsync(uri));
             }
 
             if (notificationDelegate != null)
             {
-                var additionalDataJToken = jObject["custom"]["a"];
                 IDictionary<string, string> additionalData = null;
 
-                if (additionalDataJToken != null)
-                    additionalData = additionalDataJToken.ToObject<Dictionary<string, string>>();
+                if (custom.ContainsKey("a"))
+                {
+                    additionalData = custom.GetNamedObject("a")
+                        .ToDictionary(kv => kv.Key, kv => kv.Value.GetString());
+                }
 
                 notificationDelegate(message, additionalData, initDone);
             }
@@ -376,10 +388,10 @@ namespace OneSignalSDK_WP_WNS
 
             try
             {
-                JObject jsonObject = JObject.FromObject(new
+                var jsonObject = new JsonObject
                 {
-                    notification_types = status ? "1" : "-2",
-                });
+                    { "notification_types", JsonValue.CreateStringValue(status ? "1" : "-2") },
+                };
                 string urlString = "players/" + mPlayerId;
 
                 var client = GetHttpClient();
