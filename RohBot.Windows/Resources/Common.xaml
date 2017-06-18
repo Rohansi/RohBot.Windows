@@ -51,4 +51,7 @@
     <SolidColorBrush x:Key="RohBotSendBackgroundDisabledBrush" Color="{ThemeResource RohBotSendBackgroundDisabledColor}" />
     <SolidColorBrush x:Key="RohBotSendForegroundBrush" Color="{ThemeResource RohBotSendForegroundColor}" />
     <SolidColorBrush x:Key="RohBotSendForegroundDisabledBrush" Color="{ThemeResource RohBotSendForegroundDisabledColor}" />
+
+    <SolidColorBrush x:Key="RohBotCameraForegroundBrush" Color="{ThemeResource RohBotCameraForegroundColor}" />
+    <SolidColorBrush x:Key="RohBotCameraForegroundDisabledBrush" Color="{ThemeResource RohBotCameraForegroundDisabledColor}" />
 </ResourceDictionary>

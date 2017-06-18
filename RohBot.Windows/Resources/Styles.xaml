@@ -530,7 +530,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Content" Value="&#xE722;" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{ThemeResource RohBotSendForegroundBrush}"/>
+        <Setter Property="Foreground" Value="{ThemeResource RohBotCameraForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontWeight" Value="Normal" />
@@ -559,7 +559,7 @@
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Foreground">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RohBotSendForegroundDisabledBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource RohBotCameraForegroundDisabledBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>

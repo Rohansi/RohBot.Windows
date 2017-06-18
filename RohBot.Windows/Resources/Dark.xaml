@@ -61,4 +61,7 @@
     <Color x:Key="RohBotSendBackgroundDisabledColor">Transparent</Color>
     <Color x:Key="RohBotSendForegroundColor">#D1CFCD</Color>
     <Color x:Key="RohBotSendForegroundDisabledColor">#666666</Color>
+
+    <Color x:Key="RohBotCameraForegroundColor">#D1CFCD</Color>
+    <Color x:Key="RohBotCameraForegroundDisabledColor">#666666</Color>
 </ResourceDictionary>

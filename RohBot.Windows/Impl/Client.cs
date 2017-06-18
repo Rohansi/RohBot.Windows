@@ -30,6 +30,7 @@ namespace RohBot.Impl
         private Room _currentRoom;
         private bool _isLoggedIn;
         private string _name;
+        private bool _hasReceivedRooms;
 
         public Connection Connection { get; }
 
@@ -51,6 +52,17 @@ namespace RohBot.Impl
             {
                 if (value == _name) return;
                 _name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool HasReceivedRooms
+        {
+            get => _hasReceivedRooms;
+            private set
+            {
+                if (value == _hasReceivedRooms) return;
+                _hasReceivedRooms = value;
                 OnPropertyChanged();
             }
         }
@@ -278,6 +290,7 @@ namespace RohBot.Impl
                             content == "You can not register while logged in.")
                         {
                             IsLoggedIn = true;
+                            HasReceivedRooms = true;
                             Authenticated?.Invoke(true, content);
                         }
                         else
@@ -311,7 +324,6 @@ namespace RohBot.Impl
 
         private static void AddLineToRoom(Room room, HistoryLine line)
         {
-            // TODO: combine more efficiently. this reparses links!
             var prevLine = room.Messages.LastOrDefault();
             if (prevLine != null &&
                 line.Type == HistoryLineType.Chat &&
